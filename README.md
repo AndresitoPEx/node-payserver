@@ -1,47 +1,98 @@
-<p align="center">
-  <a href="https://fl0.com/" target="blank">
-    <img src="https://user-images.githubusercontent.com/88681427/217122968-e6132cad-1944-4ebe-9ec1-105af6a18c4f.png">
-  </a>
-</p>
+# NodeJS Server Example
 
-<h2 align="center">Node.js Quickstart</h2>
-<p align="center">Backend engineering, supercharged.</p>
+This is an example of how to create the server side in nodeJS for
+the payment form.
 
-## Overview
+## Requirements
 
-Use this repository to get up and running on FL0 with the following stack:
+You need to install [node.js LTS version](https://nodejs.org/en/).
 
-<table>
-<tr>
-  <th>Language</th>
-  <td>Javascript</td>
-</tr>
-<tr>
-  <th>Router</th>
-  <td>Express</td>
-</tr>
-</table>
+## Payment hash verification
 
-## Getting Started
+Payment hash must be validated on the server side to prevent the exposure of your
+personal hash key.
 
-Clone this repo and run the following commands from the project root:
+### Server side
 
-1. `npm install`
-2. `npm start`
-3. Visit http://localhost:3000 to see your app running
+```js
+const express = require('express')
+const hmacSHA256 = require('crypto-js/hmac-sha256')
+const Hex = require('crypto-js/enc-hex')
+const app = express()
 
-## Deploying to FL0
+// In a separate file
+exports.createFormToken = async paymentConf => {
+  // format: 123456789
+  const username = '~~CHANGE_ME_USER~~'
 
-Checkout our [Getting Started Guide](https://docs.fl0.com) in the FL0 documentation!
+  // format: testprivatekey_XXXXXXX
+  const password = '~~CHANGE_ME_PASSWORD~~'
 
-## Questions
+  // format: api.my.psp.domain.name without https
+  const endpoint = '~~CHANGE_ME_ENDPOINT_NO_HTTPS~~'
 
-If you have any questions about FL0 or this template codebase please head on over to our [Discord channel](https://discord.gg/AmmVTt9Jrw).
+  const createPaymentEndpoint = `https://${username}:${password}@${endpoint}/api-payment/V4/Charge/CreatePayment`
 
-## Issues
+  try {
+    const response = await axios.post(createPaymentEndpoint, paymentConf, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (!response?.data?.answer?.formToken) throw response
+    return response.data.answer.formToken
+  } catch (error) {
+    throw error
+  }
+}
+/**
+ * Generates a payment token for the given configuration
+ */
+app.post('/createPayment', async (req, res) => {
+  const paymentConf = req.body.paymentConf
 
-Any issues or feature requests can be raised on the [Issues page](https://github.com/fl0zone/template-nodejs/issues) of this repo.
+  try {
+    const formToken = await createFormToken(paymentConf)
+    res.send(formToken)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
 
-## License
+(...)
+// Validates the given payment data (hash)
+app.post('/validatePayment', (req, res) => {
+  const answer = req.body.clientAnswer
+  const hash = req.body.hash
+  const answerHash = Hex.stringify(
+    hmacSHA256(JSON.stringify(answer), 'CHANGE_ME: HMAC SHA256 KEY')
+  )
+  if (hash === answerHash) res.status(200).send('Valid payment')
+  else res.status(500).send('Payment hash mismatch')
+})
+(...)
+```
 
-This template repository is [MIT licensed](LICENSE).
+### Client side
+
+```js
+await KR.onSubmit(paymentData => {
+  const response = await fetch('http://localhost:3000/validatePayment', {
+    method: "POST",
+    body: JSON.stringify(paymentData)
+  })
+
+  if (response.status === 200) this.message = 'Payment successful!'
+  return false
+})
+```
+
+## Run it from github
+
+You can run the example node.js server by running:
+
+```sh
+cd examples/server
+npm i
+npm run start
+```

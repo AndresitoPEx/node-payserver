@@ -1,14 +1,18 @@
 {
-  "name": "@fl0/template-nodejs",
+  "name": "server",
   "version": "1.0.0",
-  "description": "A simple Node.js Express app for getting started on FL0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node index.js"
   },
-  "author": "",
+  "author": "Lyra",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "axios": "1.3.4",
+    "cors": "2.8.5",
+    "crypto-js": "4.1.1",
+    "express": "4.18.2",
+    "nodemon": "2.0.21"
   }
 }
