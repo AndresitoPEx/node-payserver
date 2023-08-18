@@ -4,7 +4,7 @@ const { createFormToken } = require('./createPayment');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const Hex = require('crypto-js/enc-hex');
 const app = express();
-const port = process.env.PORT ?? 2000;
+const port = 2000;
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 // Body parser
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+  
 app.get('/', (req, res) => {
   res.send('Funciona'); 
 });
