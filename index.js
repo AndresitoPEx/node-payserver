@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { createFormToken } = require('./createPayment');
@@ -5,7 +6,8 @@ const morgan = require('morgan');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const Hex = require('crypto-js/enc-hex');
 const app = express();
-const port = 2000;
+const port = process.env.PORT || 2000; // Use environment variable for port if available
+
 
 app.use(morgan('dev'));
 
@@ -41,6 +43,8 @@ app.post('/createPayment', async (req, res) => {
   }
 });
 
+const SECRET_KEY = process.env.SECRET_KEY || 'your_default_secret_key';
+
 /**
  * Validates the given payment data (hash)
  */
@@ -48,7 +52,7 @@ app.post('/validatePayment', (req, res) => {
   const answer = req.body.clientAnswer;
   const hash = req.body.hash;
   const answerHash = Hex.stringify(
-    hmacSHA256(JSON.stringify(answer), '40hE0bHKAQPGZZyyM74W0XnY8SWqIynq6xdrLG6GgTbCS')
+    hmacSHA256(JSON.stringify(answer), SECRET_KEY)
   );
 
   console.log('Received clientAnswer:', answer);
@@ -73,7 +77,7 @@ app.post('/ipn', (req, res) => {
 
   // Verify the hash
   const receivedHash = req.headers['hash'];
-  const computedHash = Hex.stringify(hmacSHA256(JSON.stringify(req.body), '40hE0bHKAQPGZZyyM74W0XnY8SWqIynq6xdrLG6GgTbCS'));
+  const computedHash = Hex.stringify(hmacSHA256(JSON.stringify(req.body), SECRET_KEY));
 
   console.log('Calculated hash:', computedHash);
 
