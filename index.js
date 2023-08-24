@@ -44,7 +44,6 @@ app.post('/createPayment', async (req, res) => {
 });
 
 const SECRET_KEY = process.env.SECRET_KEY || 'your_default_secret_key';
-
 /**
  * Validates the given payment data (hash)
  */
@@ -75,12 +74,14 @@ app.post('/ipn', (req, res) => {
   console.log('Received headers:', req.headers);
   console.log('Received body:', JSON.stringify(req.body));
 
-  // Verify the hash
-  const receivedHash = req.headers['hash'];
-  const computedHash = Hex.stringify(hmacSHA256(JSON.stringify(req.body), SECRET_KEY));
+  // Extract the key from the body
+  const secretKeyFromRequestBody = req.body['kr-hash-key'];
+
+  // Verify the hash using the key from the body
+  const receivedHash = req.body['kr-hash'];
+  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], secretKeyFromRequestBody));
 
   console.log('Calculated hash:', computedHash);
-
 
   if (receivedHash !== computedHash) {
     return res.status(400).send('Hash mismatch');
@@ -93,12 +94,6 @@ app.post('/ipn', (req, res) => {
   console.log('Transaction status:', transactionStatus);
   // Respond to the notification
   res.status(200).send('OK');
-
-});
-
-app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  res.status(500).send('Internal server error');
 });
 
 
