@@ -69,7 +69,6 @@ app.post('/validatePayment', (req, res) => {
 
 // IPN Endpoint
 app.post('/ipn', (req, res) => {
-
   // Log all received headers and body for debugging
   console.log('Received headers:', req.headers);
   console.log('Received body:', JSON.stringify(req.body));
@@ -79,7 +78,7 @@ app.post('/ipn', (req, res) => {
 
   // Verify the hash using the key from the body
   const receivedHash = req.body['kr-hash'];
-  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], req.body['kr-hash-key']));
+  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], secretKeyFromRequestBody));
 
   console.log('Calculated hash:', computedHash);
 
@@ -95,6 +94,7 @@ app.post('/ipn', (req, res) => {
   // Respond to the notification
   res.status(200).send('OK');
 });
+
 
 
 
