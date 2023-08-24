@@ -78,22 +78,27 @@ app.post('/ipn', (req, res) => {
 
   // Verify the hash using the key from the body
   const receivedHash = req.body['kr-hash'];
-  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], secretKeyFromRequestBody));
+  
+  // Use the same method to calculate the hash as in /validatePayment
+  const computedHash = Hex.stringify(
+    hmacSHA256(JSON.stringify(req.body['kr-answer']), secretKeyFromRequestBody)
+  );
 
   console.log('Calculated hash:', computedHash);
 
-  if (receivedHash !== computedHash) {
+  if (receivedHash === computedHash) {
+    // Process the notification
+    const transactionStatus = req.body.status;
+    // Update the transaction status in your database
+
+    console.log('Transaction status:', transactionStatus);
+    // Respond to the notification
+    res.status(200).send('OK');
+  } else {
     return res.status(400).send('Hash mismatch');
   }
-
-  // Process the notification
-  const transactionStatus = req.body.status;
-  // Update the transaction status in your database
-
-  console.log('Transaction status:', transactionStatus);
-  // Respond to the notification
-  res.status(200).send('OK');
 });
+
 
 
 
