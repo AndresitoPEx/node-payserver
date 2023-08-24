@@ -79,7 +79,7 @@ app.post('/ipn', (req, res) => {
 
   // Verify the hash using the key from the body
   const receivedHash = req.body['kr-hash'];
-  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], secretKeyFromRequestBody));
+  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], req.body['kr-hash-key']));
 
   console.log('Calculated hash:', computedHash);
 
