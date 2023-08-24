@@ -67,13 +67,15 @@ app.post('/validatePayment', (req, res) => {
 // IPN Endpoint
 app.post('/ipn', (req, res) => {
 
+  // Log all received headers and body for debugging
+  console.log('Received headers:', req.headers);
+  console.log('Received body:', JSON.stringify(req.body));
+
   // Verify the hash
   const receivedHash = req.headers['hash'];
   const computedHash = Hex.stringify(hmacSHA256(JSON.stringify(req.body), '40hE0bHKAQPGZZyyM74W0XnY8SWqIynq6xdrLG6GgTbCS'));
 
-  console.log('Received body:', JSON.stringify(req.body));
-  console.log('Received hash:', receivedHash);
-  console.log('Received hash:', req.headers['hash']);
+  console.log('Calculated hash:', computedHash);
 
 
   if (receivedHash !== computedHash) {
@@ -84,12 +86,10 @@ app.post('/ipn', (req, res) => {
   const transactionStatus = req.body.status;
   // Update the transaction status in your database
 
+  console.log('Transaction status:', transactionStatus);
   // Respond to the notification
   res.status(200).send('OK');
 
-  console.log('Calculated hash:', computedHash);
-  console.log('Transaction status:', transactionStatus);
-  
 });
 
 app.use((err, req, res, next) => {
