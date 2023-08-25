@@ -11,7 +11,17 @@ const port = process.env.PORT || 2000; // Use environment variable for port if a
 
 app.use(morgan('dev'));
 
+// // IP Authorization
+// app.use((req, res, next) => {
+//   const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+//   const ipRange = '194.50.38.'; // Approximation to the range 194.50.38.0/24
 
+//   if (clientIp.startsWith(ipRange)) {
+//     next(); // Authorized IP, continue to the next middleware
+//   } else {
+//     res.status(403).send('Unauthorized IP'); // Unauthorized IP
+//   }
+// });
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -78,9 +88,9 @@ app.post('/ipn', (req, res) => {
   // Extract the key from the body
   const secretKeyFromRequestBody = req.body['kr-hash-key'];
 
-  // Before calculating the hash, make sure the JSON string for 'kr-answer' is well-formatted
-  const formattedKrAnswer = JSON.stringify(JSON.parse(req.body['kr-answer']));
-  const computedHash = Hex.stringify(hmacSHA256(formattedKrAnswer, secretKeyFromRequestBody));
+  // Verify the hash using the key from the body
+  const receivedHash = req.body['kr-hash'];
+  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], secretKeyFromRequestBody));
 
   console.log('Calculated hash:', computedHash);
 
