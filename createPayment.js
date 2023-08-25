@@ -18,7 +18,7 @@ exports.createFormToken = async paymentConf => {
 
   try {
     const response = await axios.post(createPaymentEndpoint, {
-      ...paymentConf,
+      ...paymentConf, 
       customer: {
         billingDetails: {
           firstName: paymentConf.customer.billingDetails.firstName,

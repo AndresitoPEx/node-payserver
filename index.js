@@ -81,30 +81,20 @@ app.post('/validatePayment', (req, res) => {
 
 // IPN Endpoint
 app.post('/ipn', (req, res) => {
-  // Log all received headers and body for debugging
-  console.log('Received headers:', req.headers);
-  console.log('Received body:', JSON.stringify(req.body));
 
-  // Extract the key from the body
-  const secretKeyFromRequestBody = req.body['kr-hash-key'];
+  const answer = JSON.parse(req.body["kr-answer"])
+  const hash = req.body["kr-hash"]
 
-  // Verify the hash using the key from the body
-  const receivedHash = req.body['kr-hash'];
-  const computedHash = Hex.stringify(hmacSHA256(req.body['kr-answer'], secretKeyFromRequestBody));
+  const answerHash = Hex.stringify(
+    hmacSHA256(JSON.stringify(answer), keys.password)
+  )
+  console.log(answerHash);
+  console.log(hash);
 
-  console.log('Calculated hash:', computedHash);
+  if (hash === answerHash)
+    res.status(200).send({ 'response': answer.orderStatus })
+  else res.status(500).send({ 'response': 'Error catastrófico, puede estar teniendo un intento de fraude' })
 
-  if (receivedHash !== computedHash) {
-    return res.status(400).send('Hash mismatch');
-  }
-
-  // Process the notification
-  const transactionStatus = req.body.status;
-  // Update the transaction status in your database
-
-  console.log('Transaction status:', transactionStatus);
-  // Respond to the notification
-  res.status(200).send('OK');
 });
 
 
