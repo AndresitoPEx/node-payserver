@@ -81,22 +81,21 @@ app.post('/validatePayment', (req, res) => {
 
 // IPN Endpoint
 app.post('/ipn', (req, res) => {
-
-  const answer = JSON.parse(req.body["kr-answer"])
-  const hash = req.body["kr-hash"]
+  const answer = JSON.parse(req.body["kr-answer"]);
+  const hash = req.body["kr-hash"];
 
   const answerHash = Hex.stringify(
-    hmacSHA256(JSON.stringify(answer), keys.password)
-  )
+    hmacSHA256(JSON.stringify(answer), SECRET_KEY) // Changed keys.password to SECRET_KEY
+  );
+
   console.log(answerHash);
   console.log(hash);
 
   if (hash === answerHash)
-    res.status(200).send({ 'response': answer.orderStatus })
-  else res.status(500).send({ 'response': 'Error catastrófico, puede estar teniendo un intento de fraude' })
-
+    res.status(200).send({ 'response': answer.orderStatus });
+  else
+    res.status(500).send({ 'response': 'Error catastrófico, puede estar teniendo un intento de fraude' });
 });
-
 
 
 
