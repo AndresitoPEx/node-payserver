@@ -56,6 +56,7 @@ app.post('/createPayment', async (req, res) => {
 });
 
 const SECRET_KEY = process.env.SECRET_KEY || 'your_default_secret_key';
+const PUBLIC_PASSWORD = process.env.PUBLIC_PASSWORD || 'your_default_public_password';
 /**
  * Validates the given payment data (hash)
  */
