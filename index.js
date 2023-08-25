@@ -11,17 +11,7 @@ const port = process.env.PORT || 2000; // Use environment variable for port if a
 
 app.use(morgan('dev'));
 
-// IP Authorization
-app.use((req, res, next) => {
-  const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  const ipRange = '194.50.38.'; // Approximation to the range 194.50.38.0/24
 
-  if (clientIp.startsWith(ipRange)) {
-    next(); // Authorized IP, continue to the next middleware
-  } else {
-    res.status(403).send('Unauthorized IP'); // Unauthorized IP
-  }
-});
 
 app.use(cors());
 app.use((req, res, next) => {
