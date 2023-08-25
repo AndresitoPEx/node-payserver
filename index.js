@@ -11,6 +11,18 @@ const port = process.env.PORT || 2000; // Use environment variable for port if a
 
 app.use(morgan('dev'));
 
+// IP Authorization
+app.use((req, res, next) => {
+  const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const ipRange = '194.50.38.'; // Approximation to the range 194.50.38.0/24
+
+  if (clientIp.startsWith(ipRange)) {
+    next(); // Authorized IP, continue to the next middleware
+  } else {
+    res.status(403).send('Unauthorized IP'); // Unauthorized IP
+  }
+});
+
 app.use(cors());
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -76,29 +88,24 @@ app.post('/ipn', (req, res) => {
   // Extract the key from the body
   const secretKeyFromRequestBody = req.body['kr-hash-key'];
 
-  // Verify the hash using the key from the body
-  const receivedHash = req.body['kr-hash'];
-  
-  // Use the same method to calculate the hash as in /validatePayment
-  const computedHash = Hex.stringify(
-    hmacSHA256(JSON.stringify(req.body['kr-answer']), secretKeyFromRequestBody)
-  );
+  // Before calculating the hash, make sure the JSON string for 'kr-answer' is well-formatted
+  const formattedKrAnswer = JSON.stringify(JSON.parse(req.body['kr-answer']));
+  const computedHash = Hex.stringify(hmacSHA256(formattedKrAnswer, secretKeyFromRequestBody));
 
   console.log('Calculated hash:', computedHash);
 
-  if (receivedHash === computedHash) {
-    // Process the notification
-    const transactionStatus = req.body.status;
-    // Update the transaction status in your database
-
-    console.log('Transaction status:', transactionStatus);
-    // Respond to the notification
-    res.status(200).send('OK');
-  } else {
+  if (receivedHash !== computedHash) {
     return res.status(400).send('Hash mismatch');
   }
-});
 
+  // Process the notification
+  const transactionStatus = req.body.status;
+  // Update the transaction status in your database
+
+  console.log('Transaction status:', transactionStatus);
+  // Respond to the notification
+  res.status(200).send('OK');
+});
 
 
 
