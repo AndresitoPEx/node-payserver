@@ -85,7 +85,7 @@ app.post('/ipn', (req, res) => {
   const hash = req.body["kr-hash"];
 
   const answerHash = Hex.stringify(
-    hmacSHA256(JSON.stringify(answer), SECRET_KEY) // Changed keys.password to SECRET_KEY
+    hmacSHA256(JSON.stringify(answer), PUBLIC_PASSWORD) // Changed keys.password to SECRET_KEY
   );
 
   console.log(answerHash);
