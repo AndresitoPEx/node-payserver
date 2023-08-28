@@ -1,15 +1,14 @@
-require('dotenv').config();
 const axios = require('axios').default
 
 exports.createFormToken = async paymentConf => {
   // format: 123456789
-  const username = process.env.USERNAME
+  const username = '14245093'
 
   // format: testprivatekey_XXXXXXX
-  const password = process.env.PUBLIC_PASSWORD
+  const password = 'testpassword_6JpDLl2tGvCShpS1tJWXHV6sVPJpLiCGOUAzvkJtl2HZk'
 
   // format: api.my.psp.domain.name without https
-  const endpoint = process.env.ENDPOINT
+  const endpoint = 'api.micuentaweb.pe'
 
   const createPaymentEndpoint = `https://${username}:${password}@${endpoint}/api-payment/V4/Charge/CreatePayment`
 
