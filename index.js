@@ -6,22 +6,11 @@ const morgan = require('morgan');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const Hex = require('crypto-js/enc-hex');
 const app = express();
-const port = process.env.PORT || 2000; // Use environment variable for port if available
+const port = process.env.PORT || 2000; 
 
 
 app.use(morgan('dev'));
 
-// // IP Authorization
-// app.use((req, res, next) => {
-//   const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-//   const ipRange = '194.50.38.'; // Approximation to the range 194.50.38.0/24
-
-//   if (clientIp.startsWith(ipRange)) {
-//     next(); // Authorized IP, continue to the next middleware
-//   } else {
-//     res.status(403).send('Unauthorized IP'); // Unauthorized IP
-//   }
-// });
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -38,9 +27,7 @@ app.get('/', (req, res) => {
   res.send('Funciona');
 });
 
-/**
- * Generates a payment token for the given configuration
- */
+// Create payment endpoint
 app.post('/createPayment', async (req, res) => {
   const paymentConf = req.body.paymentConf;
 
@@ -57,9 +44,8 @@ app.post('/createPayment', async (req, res) => {
 
 const SECRET_KEY = process.env.SECRET_KEY || 'your_default_secret_key';
 const PUBLIC_PASSWORD = process.env.PUBLIC_PASSWORD || 'your_default_public_password';
-/**
- * Validates the given payment data (hash)
- */
+
+// Validate payment endpoint
 app.post('/validatePayment', (req, res) => {
   const answer = req.body.clientAnswer;
   const hash = req.body.hash;
@@ -86,7 +72,7 @@ app.post('/ipn', (req, res) => {
   const hash = req.body["kr-hash"];
 
   const answerHash = Hex.stringify(
-    hmacSHA256(JSON.stringify(answer), PUBLIC_PASSWORD) // Changed keys.password to SECRET_KEY
+    hmacSHA256(JSON.stringify(answer), PUBLIC_PASSWORD) 
   );
 
   console.log(answerHash);
