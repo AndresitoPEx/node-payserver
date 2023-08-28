@@ -42,8 +42,8 @@ app.post('/createPayment', async (req, res) => {
   }
 });
 
-const SECRET_KEY = process.env.SECRET_KEY || 'your_default_secret_key';
-const PUBLIC_PASSWORD = process.env.PUBLIC_PASSWORD || 'your_default_public_password';
+const SECRET_KEY = process.env.SECRET_KEY || 'o8oyTrIj4VKIaZazJAVcJXGCk87d8vFHiRhXnoHMPgGA2';
+const PUBLIC_PASSWORD = process.env.PUBLIC_PASSWORD || 'prodpassword_1RFM9PCTIGlfZKaZimqsbd1RKbuNjMHLaI2UsK6YF2XtU';
 
 // Validate payment endpoint
 app.post('/validatePayment', (req, res) => {
