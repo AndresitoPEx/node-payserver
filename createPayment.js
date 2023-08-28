@@ -5,7 +5,7 @@ exports.createFormToken = async paymentConf => {
   const username = '14245093'
 
   // format: testprivatekey_XXXXXXX
-  const password = 'testpassword_6JpDLl2tGvCShpS1tJWXHV6sVPJpLiCGOUAzvkJtl2HZk'
+  const password = 'prodpassword_1RFM9PCTIGlfZKaZimqsbd1RKbuNjMHLaI2UsK6YF2XtU'
 
   // format: api.my.psp.domain.name without https
   const endpoint = 'api.micuentaweb.pe'
