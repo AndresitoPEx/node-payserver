@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const Hex = require('crypto-js/enc-hex');
 const app = express();
-const port = process.env.PORT || 2000; 
+const port = process.env.PORT || 3000; 
 
 
 app.use(morgan('dev'));
